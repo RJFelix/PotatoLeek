@@ -1,0 +1,14 @@
+<div .ui.container>
+
+    <h1>#{eTitle}
+
+    <p>#{eDescription}
+
+    <form method=post action=@{EnterpriseIdR eid}?_method=PUT enctype=#{enctype}>
+
+        ^{updateEnterpriseFormWidget}
+
+        <button .btn.btn-primary type="submit">
+            Update Enterprise
+        <button .btn.btn-danger formaction=@{EnterpriseIdR eid}?_method=DELETE>
+            Delete Enterprise

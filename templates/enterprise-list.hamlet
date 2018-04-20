@@ -1,0 +1,21 @@
+<div .ui.container>
+
+    <h1>Enterprise List</h1>
+
+    <h2>Add Enterprise</h2>
+    <div .row>
+        <div .col-lg-6>
+            <div .bs-callout bs-callout-info well>
+                <form method=post action=@{EnterpriseR} enctype=#{enctype}>
+
+                    ^{addEnterpriseFormWidget}
+
+                    <button .btn.btn-primary type="submit">
+                        Add Enterprise
+
+                
+
+    <ul>
+        $forall Entity enterpriseid enterprise <- allEnterprises
+            <li>
+                <a href="@{EnterpriseIdR enterpriseid}">#{enterpriseTitle enterprise} -- #{enterpriseDescription enterprise}
