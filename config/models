@@ -21,3 +21,8 @@ Enterprise json
     title Text
     description Text
     deriving Show
+
+Property json
+    title Text
+    description Text
+    enterpriseId EnterpriseId

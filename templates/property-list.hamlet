@@ -1,0 +1,24 @@
+<div .ui.container>
+
+    $maybe eName <- enterpriseName
+      <h1>Properties for #{eName}
+    $nothing
+      <h1>Property List
+
+    <h2>Add Property
+    <div .row>
+        <div .col-lg-6>
+            <div .bs-callout bs-callout-info well>
+                <form method=post action=@{PropertyR} enctype=#{enctype}>
+
+                    ^{addPropertyFormWidget}
+
+                    <button .btn.btn-primary type="submit">
+                        Add Property
+
+                
+
+    <ul>
+        $forall Entity propertyid property <- allProperties
+            <li>
+                <a href="@{PropertyIdR propertyid}">#{propertyTitle property} -- #{propertyDescription property}

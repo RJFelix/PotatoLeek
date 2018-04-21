@@ -1,0 +1,5 @@
+<div .ui.container>
+
+    <h1>#{pTitle}
+
+    <p>#{pDescription}
