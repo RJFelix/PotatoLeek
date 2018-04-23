@@ -17,4 +17,4 @@
 /enterprise/#EnterpriseId EnterpriseIdR GET PUT DELETE
 
 /property PropertyR GET POST
-/property/#PropertyId PropertyIdR GET 
+/property/#PropertyId PropertyIdR GET PUT DELETE

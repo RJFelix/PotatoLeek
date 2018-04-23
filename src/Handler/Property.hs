@@ -53,19 +53,48 @@ postPropertyR = do
 getPropertyIdR :: PropertyId -> Handler Html
 getPropertyIdR pid = do
     p <- runDB $ get404 pid
+    es <- runDB $ selectList [] [Asc EnterpriseId]
+    (updatePropertyFormWidget, enctype) <- generateFormPost (updatePropertyForm es (Just p))
     defaultLayout $ do
         let pTitle = propertyTitle p
             pDescription = propertyDescription p
         setTitle . toHtml $ pTitle
         $(widgetFile "property-page")
 
+putPropertyIdR :: PropertyId -> Handler Html
+putPropertyIdR pid = do
+    es <- runDB $ selectList [] [Asc EnterpriseId]
+    ((result, _), _) <- runFormPost (updatePropertyForm es Nothing)
+    _ <- case result of
+        FormSuccess updatedProperty -> do
+            runDB $ repsert pid updatedProperty
+    p <- runDB $ get404 pid
+    (updatePropertyFormWidget, enctype) <- generateFormPost (updatePropertyForm es (Just p))
+    defaultLayout $ do
+        let pTitle = propertyTitle p
+            pDescription = propertyDescription p
+        setTitle . toHtml $ pTitle
+        $(widgetFile "property-page")
+
+deletePropertyIdR :: PropertyId -> Handler ()
+deletePropertyIdR pid = (runDB $ delete pid) >> redirect PropertyR
 
 addPropertyForm :: Maybe EnterpriseId -> [Entity Enterprise] -> Form Property
 addPropertyForm maybeE es = renderBootstrap3 BootstrapBasicForm $ Property
     <$> areq textField "Name" Nothing
     <*> areq textField "Description" Nothing
-    <*> areq (selectFieldList ents) "Enterprise" maybeE
-  where
-    ents :: [(Text, EnterpriseId)]
-    ents = fmap idAndName es
-      where idAndName (Entity eid ent) = (enterpriseTitle ent, eid)
+    <*> areq (selectFieldList $ toFormListOn enterpriseTitle es) "Enterprise" maybeE
+
+updatePropertyForm :: [Entity Enterprise] -> Maybe Property -> Form Property
+updatePropertyForm es p = renderBootstrap3 BootstrapBasicForm $ Property
+    <$> areq textField "Name" (propertyTitle <$> p)
+    <*> areq textField "Description" (propertyDescription <$> p)
+    <*> areq (selectFieldList $ toFormListOn enterpriseTitle es) "Enterprise" (propertyEnterpriseId <$> p)
+--   where
+--     ents :: [(Text, EnterpriseId)]
+--     ents = fmap idAndName es
+--         where idAndName (Entity eid ent) = (enterpriseTitle ent, eid)
+
+toFormListOn :: (a -> Text) -> [Entity a] -> [(Text, Key a)]
+toFormListOn f es = fmap idAndText es
+    where idAndText (Entity eid ent) = (f ent, eid)

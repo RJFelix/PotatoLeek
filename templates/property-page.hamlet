@@ -3,3 +3,12 @@
     <h1>#{pTitle}
 
     <p>#{pDescription}
+
+    <form method=post action=@{PropertyIdR pid}?_method=PUT enctype=#{enctype}>
+
+        ^{updatePropertyFormWidget}
+
+        <button .btn.btn-primary type="submit">
+            Update Property
+        <button .btn.btn-danger formaction=@{PropertyIdR pid}?_method=DELETE>
+            Delete Property
