@@ -18,3 +18,7 @@ eitherToMaybe (Right a) = Just a
 type ParsedKey = Data.Text.Read.Reader Int64
 parseToKey :: ToBackendKey SqlBackend e => Text -> Maybe (Key e)
 parseToKey textId = eitherToMaybe ((fmap (toSqlKey . fst) . (decimal :: ParsedKey)) textId)
+
+toFormListOn :: (a -> Text) -> [Entity a] -> [(Text, Key a)]
+toFormListOn f es = fmap idAndText es
+    where idAndText (Entity eid ent) = (f ent, eid)
