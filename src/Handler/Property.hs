@@ -21,6 +21,21 @@ getPropertyR = do
                           ment <- getFromDBWithMaybeId eid
                           allProperties <- getProperties $ const <$> eid <*> ment
                           renderGetPropertyR allEnterprises allProperties $ (,) <$> eid <*> ment
+        
+postPropertyR :: Handler Html
+postPropertyR = do
+    allEnterprises <- runDB $ selectList [] [Asc EnterpriseId]
+    ((result, _), _) <- runFormPost (propertyForm allEnterprises Nothing Nothing)
+    case result of
+        FormSuccess newProperty -> do
+            pid <- runDB $ insert $ newProperty
+            redirect (PropertyIdR pid)
+        (FormFailure _) -> do
+            allProperties <- runDB $ selectList [] [Asc PropertyId]
+            renderGetPropertyR allEnterprises allProperties Nothing
+        FormMissing -> do
+            allProperties <- runDB $ selectList [] [Asc PropertyId]
+            renderGetPropertyR allEnterprises allProperties Nothing
 
 getFromDBWithMaybeId :: Maybe EnterpriseId -> Handler (Maybe Enterprise)
 getFromDBWithMaybeId Nothing    = pure Nothing
@@ -31,66 +46,48 @@ getProperties eid = runDB $ selectList (((==.) PropertyEnterpriseId) <$> (maybeT
                                         
 renderGetPropertyR :: [Entity Enterprise] -> [Entity Property] -> Maybe (EnterpriseId, Enterprise) -> Handler Html
 renderGetPropertyR allEnterprises allProperties selectedE = do
-    (addPropertyFormWidget, enctype) <- generateFormPost (addPropertyForm (fst <$> selectedE) allEnterprises)
+    (addPropertyFormWidget, enctype) <- generateFormPost (propertyForm allEnterprises (fst <$> selectedE) Nothing)
     defaultLayout $ do
         let enterpriseName = (enterpriseTitle . snd) <$> selectedE
         setTitle . toHtml $ maybe "All Properties" (\t -> t <> " - Properties") enterpriseName
-        $(widgetFile "property-list")
-    
-postPropertyR :: Handler Html
-postPropertyR = do
-    allEnterprises <- runDB $ selectList [] [Asc EnterpriseId]
-    ((result, addPropertyFormWidget), enctype) <- runFormPost (addPropertyForm Nothing allEnterprises)
-    _ <- case result of
-        FormSuccess newProperty -> do
-            runDB $ insert $ newProperty
-    allProperties <- runDB $ selectList [] [Asc PropertyId]
-    defaultLayout $ do
-        let enterpriseName = (Nothing :: Maybe Text)
-        setTitle "All Properties"
         $(widgetFile "property-list")
 
 getPropertyIdR :: PropertyId -> Handler Html
 getPropertyIdR pid = do
     p <- runDB $ get404 pid
     es <- runDB $ selectList [] [Asc EnterpriseId]
-    (updatePropertyFormWidget, enctype) <- generateFormPost (updatePropertyForm es (Just p))
     renderPropertyIdR es (pid, p)
 
 putPropertyIdR :: PropertyId -> Handler Html
 putPropertyIdR pid = do
     es <- runDB $ selectList [] [Asc EnterpriseId]
-    ((result, _), _) <- runFormPost (updatePropertyForm es Nothing)
-    _ <- case result of
+    ((result, _), _) <- runFormPost (propertyForm es Nothing Nothing)
+    case result of
         FormSuccess updatedProperty -> do
             runDB $ repsert pid updatedProperty
-    p <- runDB $ get404 pid
-    renderPropertyIdR es (pid, p)
+            p <- runDB $ get404 pid
+            renderPropertyIdR es (pid, p)
+        FormMissing -> do
+            p <- runDB $ get404 pid
+            renderPropertyIdR es (pid, p)
+        (FormFailure _) -> do
+            p <- runDB $ get404 pid
+            renderPropertyIdR es (pid, p)
 
 deletePropertyIdR :: PropertyId -> Handler ()
 deletePropertyIdR pid = (runDB $ delete pid) >> redirect PropertyR
 
 renderPropertyIdR :: [Entity Enterprise] -> (PropertyId, Property) -> Handler Html
 renderPropertyIdR es (pid, p) = do
-    (updatePropertyFormWidget, enctype) <- generateFormPost (updatePropertyForm es (Just p))
+    (updatePropertyFormWidget, enctype) <- generateFormPost (propertyForm es Nothing (Just p))
     defaultLayout $ do
         let pTitle = propertyTitle p
             pDescription = propertyDescription p
         setTitle . toHtml $ pTitle
         $(widgetFile "property-page")
 
-addPropertyForm :: Maybe EnterpriseId -> [Entity Enterprise] -> Form Property
-addPropertyForm maybeE es = renderBootstrap3 BootstrapBasicForm $ Property
-    <$> areq textField "Name" Nothing
-    <*> areq textField "Description" Nothing
-    <*> areq (selectFieldList $ toFormListOn enterpriseTitle es) "Enterprise" maybeE
-
-updatePropertyForm :: [Entity Enterprise] -> Maybe Property -> Form Property
-updatePropertyForm es p = renderBootstrap3 BootstrapBasicForm $ Property
-    <$> areq textField "Name" (propertyTitle <$> p)
-    <*> areq textField "Description" (propertyDescription <$> p)
-    <*> areq (selectFieldList $ toFormListOn enterpriseTitle es) "Enterprise" (propertyEnterpriseId <$> p)
-
-toFormListOn :: (a -> Text) -> [Entity a] -> [(Text, Key a)]
-toFormListOn f es = fmap idAndText es
-    where idAndText (Entity eid ent) = (f ent, eid)
+propertyForm :: [Entity Enterprise] -> Maybe EnterpriseId -> Maybe Property -> Form Property
+propertyForm es mEntId mProp = renderBootstrap3 BootstrapBasicForm $ Property
+    <$> areq textField "Name" (propertyTitle <$> mProp)
+    <*> areq textField "Description" (propertyDescription <$> mProp)
+    <*> areq (selectFieldList $ toFormListOn enterpriseTitle es) "Enterprise" (maybe mEntId (Just . propertyEnterpriseId) mProp)
