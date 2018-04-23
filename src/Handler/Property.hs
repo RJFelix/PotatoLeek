@@ -55,11 +55,7 @@ getPropertyIdR pid = do
     p <- runDB $ get404 pid
     es <- runDB $ selectList [] [Asc EnterpriseId]
     (updatePropertyFormWidget, enctype) <- generateFormPost (updatePropertyForm es (Just p))
-    defaultLayout $ do
-        let pTitle = propertyTitle p
-            pDescription = propertyDescription p
-        setTitle . toHtml $ pTitle
-        $(widgetFile "property-page")
+    renderPropertyIdR es (pid, p)
 
 putPropertyIdR :: PropertyId -> Handler Html
 putPropertyIdR pid = do
@@ -69,15 +65,19 @@ putPropertyIdR pid = do
         FormSuccess updatedProperty -> do
             runDB $ repsert pid updatedProperty
     p <- runDB $ get404 pid
+    renderPropertyIdR es (pid, p)
+
+deletePropertyIdR :: PropertyId -> Handler ()
+deletePropertyIdR pid = (runDB $ delete pid) >> redirect PropertyR
+
+renderPropertyIdR :: [Entity Enterprise] -> (PropertyId, Property) -> Handler Html
+renderPropertyIdR es (pid, p) = do
     (updatePropertyFormWidget, enctype) <- generateFormPost (updatePropertyForm es (Just p))
     defaultLayout $ do
         let pTitle = propertyTitle p
             pDescription = propertyDescription p
         setTitle . toHtml $ pTitle
         $(widgetFile "property-page")
-
-deletePropertyIdR :: PropertyId -> Handler ()
-deletePropertyIdR pid = (runDB $ delete pid) >> redirect PropertyR
 
 addPropertyForm :: Maybe EnterpriseId -> [Entity Enterprise] -> Form Property
 addPropertyForm maybeE es = renderBootstrap3 BootstrapBasicForm $ Property
@@ -90,10 +90,6 @@ updatePropertyForm es p = renderBootstrap3 BootstrapBasicForm $ Property
     <$> areq textField "Name" (propertyTitle <$> p)
     <*> areq textField "Description" (propertyDescription <$> p)
     <*> areq (selectFieldList $ toFormListOn enterpriseTitle es) "Enterprise" (propertyEnterpriseId <$> p)
---   where
---     ents :: [(Text, EnterpriseId)]
---     ents = fmap idAndName es
---         where idAndName (Entity eid ent) = (enterpriseTitle ent, eid)
 
 toFormListOn :: (a -> Text) -> [Entity a] -> [(Text, Key a)]
 toFormListOn f es = fmap idAndText es
