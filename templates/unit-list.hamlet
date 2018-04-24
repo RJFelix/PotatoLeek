@@ -1,0 +1,19 @@
+<div .ui.container>
+
+    <h1>All Units
+
+    <h2>Add a unit
+    <div .row>
+        <div .col-lg-6>
+            <div .bs-callout bs-callout-info well>
+                <form method=post action=@{UnitR} enctype=#{enctype}>
+
+                    ^{addUnitFormWidget}
+
+                    <button .btn.btn-primary type="submit">
+                        Add Unit
+
+    <ul>
+        $forall (Entity unitId unit) <- allUnits
+            <li>
+                <a href=@{UnitIdR unitId}>#{unitTitle unit} -- #{unitDescription unit} -- Capacity: #{unitCapacity unit}

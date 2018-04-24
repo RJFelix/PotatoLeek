@@ -18,3 +18,6 @@
 
 /property PropertyR GET POST
 /property/#PropertyId PropertyIdR GET PUT DELETE
+
+/unit UnitR GET POST
+/unit/#UnitId UnitIdR GET PUT DELETE

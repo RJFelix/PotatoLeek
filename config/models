@@ -26,3 +26,9 @@ Property json
     title Text
     description Text
     enterpriseId EnterpriseId
+
+Unit json
+    title Text
+    description Text
+    capacity Int
+    propertyId PropertyId
