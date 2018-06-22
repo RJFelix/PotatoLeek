@@ -24,3 +24,6 @@
 
 /tenant TenantR GET POST
 /tenant/#TenantId TenantIdR GET PUT DELETE
+
+/contract ContractR GET POST
+/contract/#ContractId ContractIdR GET PUT DELETE

@@ -8,7 +8,7 @@ import Data.Aeson
 import GHC.Generics
 
 data CollectionPeriod = Daily | Weekly | Monthly
-    deriving (Show, Read, Eq, Generic)
+    deriving (Show, Read, Eq, Generic, Enum, Bounded)
 instance ToJSON CollectionPeriod
 instance FromJSON CollectionPeriod
 
