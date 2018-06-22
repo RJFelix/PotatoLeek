@@ -46,7 +46,7 @@ putUnitIdR unitId = do
     renderGetUnitIdR ps (unitId, unit)
 
 deleteUnitIdR :: UnitId -> Handler ()
-deleteUnitIdR unitId = runDB $ delete uid >> redirect UnitR
+deleteUnitIdR uid = runDB $ delete uid >> redirect UnitR
 
 renderGetUnitIdR :: [Entity Property] -> (UnitId, Unit) -> Handler Html
 renderGetUnitIdR allProperties (unitId, unit) = do
