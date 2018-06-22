@@ -32,3 +32,35 @@ Unit json
     description Text
     capacity Int
     propertyId PropertyId
+
+Contract json
+    unitId UnitId
+    rent Int
+    startDate Day
+    endDate Day
+    active Bool
+    openEnded Bool
+    deposit Int
+    collectionPeriod CollectionPeriod
+    collectionFrequency Int
+    firstCollectionDay Day
+    notes Text
+
+Tenant json
+    name Text
+    phone Text
+    email Text
+    notes Text
+    contracts [ContractId]
+
+Transaction json
+    amount Int
+    createdDate Day
+    dueDate Day
+    contractId ContractId
+
+Payment json
+    date Day
+    amount Int
+    note Text
+    transactionId TransactionId

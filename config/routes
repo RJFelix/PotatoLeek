@@ -21,3 +21,6 @@
 
 /unit UnitR GET POST
 /unit/#UnitId UnitIdR GET PUT DELETE
+
+/tenant TenantR GET POST
+/tenant/#TenantId TenantIdR GET PUT DELETE

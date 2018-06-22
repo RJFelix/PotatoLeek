@@ -1,0 +1,25 @@
+<div .ui.container>
+
+    <h1>Tenant List</h1>
+
+    <h2>New Tenant</h2>
+    <div .row>
+        <div .col-lg-6>
+            <div .bs-callout bs-callout-info well>
+                <form method=post action=@{TenantR} enctype=#{enctype}>
+
+                    ^{addTenantFormWidget}
+
+                    <button .btn.btn-primary type="submit">
+                        New Tenant
+
+                
+
+    <ul>
+        $forall Entity tenantid tenant <- allTenants
+            <li>
+                <a href="@{TenantIdR tenantid}">#{tenantName tenant}
+                <ul>
+                    <li>Phone: #{tenantPhone tenant}  
+                    <li>Email: #{tenantEmail tenant}
+                    <li>Notes: #{tenantNotes tenant}

@@ -1,0 +1,12 @@
+<div .ui.container>
+
+    <h1>#{tName}
+
+    <form method=post action=@{TenantIdR tid}?_method=PUT enctype=#{enctype}>
+
+        ^{updateTenantFormWidget}
+
+        <button .btn.btn-primary type="submit">
+            Update Tenant
+        <button .btn.btn-danger formaction=@{TenantIdR tid}?_method=DELETE>
+            Delete Tenant
