@@ -35,6 +35,7 @@ Unit json
 
 Contract json
     unitId UnitId
+    tenantId TenantId
     rent Int
     startDate Day
     endDate Day
@@ -51,7 +52,6 @@ Tenant json
     phone Text
     email Text
     notes Text
-    contracts [ContractId]
 
 Transaction json
     amount Int

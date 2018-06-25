@@ -62,7 +62,6 @@ addTenantForm = renderBootstrap3 BootstrapBasicForm $ Tenant
     <*> areq textField "Phone Number" Nothing
     <*> areq textField "Email Address" Nothing
     <*> areq textField "Notes" Nothing
-    <*> pure []
 
 updateTenantForm :: Maybe Tenant -> Form Tenant
 updateTenantForm t = renderBootstrap3 BootstrapBasicForm $ Tenant
@@ -70,4 +69,3 @@ updateTenantForm t = renderBootstrap3 BootstrapBasicForm $ Tenant
     <*> areq textField "Phone Number" (tenantPhone <$> t)
     <*> areq textField "Email Address" (tenantEmail <$> t)
     <*> areq textField "Notes" (tenantNotes <$> t)
-    <*> pure []

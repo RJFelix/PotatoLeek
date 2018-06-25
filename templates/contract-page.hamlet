@@ -1,0 +1,32 @@
+<div .ui.container>
+
+    <h1>Contract
+
+    <ul>
+        <li>Unit ID: #{show $ contractUnitId contract}
+        <li>Tenant ID: #{show $ contractTenantId contract}
+        <li>Rent: #{show $ contractRent contract}
+        <li>Start: #{showGregorian $ contractStartDate contract}
+        <li>End: #{showGregorian $ contractEndDate contract}
+        $if contractOpenEnded contract
+          <li> "Open Ended"
+        $else
+          <li> "Not Open Ended"
+        $if contractActive contract
+          <li> "Active"
+        $else
+          <li> "Inactive"
+        <li>Deposit: #{show $ contractDeposit contract}
+        <li>Collection Period: #{show $ contractCollectionPeriod contract}
+        <li>Collection Frequency: #{show $ contractCollectionFrequency contract}
+        <li>First Collection Day: #{showGregorian $ contractFirstCollectionDay contract}
+        <li>Notes: #{contractNotes contract}
+
+    <form method=post action=@{ContractIdR cid}?_method=PUT enctype=#{enctype}>
+
+        ^{updateContractFormWidget}
+
+        <button .btn.btn-primary type="submit">
+            Update Contract
+        <button .btn.btn-danger formaction=@{ContractIdR cid}?_method=DELETE>
+            Delete Contract
