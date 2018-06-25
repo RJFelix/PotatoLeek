@@ -55,7 +55,9 @@ putContractIdR cid = do
     renderGetContractIdR allUnits allTenants (cid, c)
 
 deleteContractIdR :: ContractId -> Handler Html
-deleteContractIdR cid = runDB $ delete cid >> redirect ContractR
+deleteContractIdR cid = do
+    runDB $ delete cid 
+    redirect ContractR
 
 renderGetContractIdR :: [Entity Unit] -> [Entity Tenant] -> (ContractId, Contract) -> Handler Html
 renderGetContractIdR allUnits allTenants (cid, contract) = do
